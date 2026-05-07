@@ -3,6 +3,9 @@ import streamlit as st
 
 def initial_session_defaults():
     defaults = {
+        "user_id": None,
+        "username": None,
+        
         "reps": 0,
         "target_sets": 0,
         "reps_per_set": 0,
@@ -42,3 +45,4 @@ def initial_session_defaults():
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
+

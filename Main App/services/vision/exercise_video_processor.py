@@ -7,12 +7,15 @@ import threading
 from streamlit_webrtc import VideoProcessorBase
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
-from detectors.squat import SquatDetector
-from detectors.pushup import PushUpDetector
-from detectors.biceps_curl import BicepsCurlDetector
-from detectors.shoulder_press import ShoulderPressDetector
-from detectors.lunges import LungesDetector
-from services.config.workout_config import POSE_CONNECTIONS
+from ...detectors.squat import SquatDetector
+from ...detectors.pushup import PushUpDetector
+from ...detectors.biceps_curl import BicepsCurlDetector
+from ...detectors.shoulder_press import ShoulderPressDetector
+from ...detectors.lunges import LungesDetector
+from ..config.workout_config import POSE_CONNECTIONS
+
+# NOTE: This module is loaded by Streamlit; compute paths relative to this file.
+
 
 
 class VideoProcessorClass(VideoProcessorBase):
@@ -21,7 +24,11 @@ class VideoProcessorClass(VideoProcessorBase):
         self._latest_metrics = None
         self._exercise_type = "Squats"
 
-        model_path = os.path.join(os.getcwd(), "ml_models", "pose_landmarker_full.task")
+        model_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "ml_models", "pose_landmarker_full.task")
+        )
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Pose landmarker model not found at: {model_path}")
         base_option = python.BaseOptions(model_asset_path=model_path)
 
         options = vision.PoseLandmarkerOptions(
