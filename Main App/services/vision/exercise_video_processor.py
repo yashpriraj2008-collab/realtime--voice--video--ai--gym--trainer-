@@ -1,18 +1,46 @@
 import os
-import cv2
-import av
-import numpy as np
-import mediapipe as mp
 import threading
-from streamlit_webrtc import VideoProcessorBase
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
-from ...detectors.squat import SquatDetector
-from ...detectors.pushup import PushUpDetector
-from ...detectors.biceps_curl import BicepsCurlDetector
-from ...detectors.shoulder_press import ShoulderPressDetector
-from ...detectors.lunges import LungesDetector
-from ..config.workout_config import POSE_CONNECTIONS
+
+# Optional runtime deps: this file is imported by Streamlit.
+# If they aren't installed in the current environment, fail gracefully
+# so the app can still start (e.g., UI-only mode).
+try:
+    import cv2  # type: ignore
+except Exception:  # pragma: no cover
+    cv2 = None
+
+try:
+    import av  # type: ignore
+except Exception:  # pragma: no cover
+    av = None
+
+try:
+    import numpy as np  # type: ignore
+except Exception:  # pragma: no cover
+    np = None
+
+try:
+    import mediapipe as mp  # type: ignore
+    from mediapipe.tasks import python  # type: ignore
+    from mediapipe.tasks.python import vision  # type: ignore
+except Exception:  # pragma: no cover
+    mp = None
+    python = None
+    vision = None
+
+try:
+    from streamlit_webrtc import VideoProcessorBase  # type: ignore
+except Exception:  # pragma: no cover
+    VideoProcessorBase = object
+
+from services.config.workout_config import POSE_CONNECTIONS
+
+from detectors.squat import SquatDetector
+from detectors.pushup import PushUpDetector
+from detectors.biceps_curl import BicepsCurlDetector
+from detectors.shoulder_press import ShoulderPressDetector
+from detectors.lunges import LungesDetector
+
 
 # NOTE: This module is loaded by Streamlit; compute paths relative to this file.
 
@@ -20,6 +48,11 @@ from ..config.workout_config import POSE_CONNECTIONS
 
 class VideoProcessorClass(VideoProcessorBase):
     def __init__(self):
+        if cv2 is None or av is None or np is None or mp is None or python is None or vision is None:
+            raise ImportError(
+                "Missing video-processing dependencies. Install opencv-python-headless, av, numpy, mediapipe, and streamlit-webrtc."
+            )
+
         self._lock = threading.Lock()
         self._latest_metrics = None
         self._exercise_type = "Squats"

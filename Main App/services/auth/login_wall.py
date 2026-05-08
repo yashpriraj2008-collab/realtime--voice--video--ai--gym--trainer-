@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st  # type: ignore[reportMissingImports]
 
 from services.persistence.exercise_repository import get_or_create_user
 
@@ -26,4 +26,3 @@ def render_login_wall():
         st.rerun()
 
     return False
-
