@@ -19,14 +19,17 @@ class LLMCoach:
             {"role": "user", "content": prompt}
         ]
 
-        response = self.client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=messages,
-            temperature=0.4,
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=messages,
+                temperature=0.4,
+            )
 
-        text = response.choices[0].message.content.strip()
-        self.history.append({"role": "assistant", "content": text})
-
-        return text
-    
+            text = response.choices[0].message.content.strip()
+            self.history.append({"role": "assistant", "content": text})
+            return text
+        except Exception:
+            # Deployment stability: never crash Streamlit UI because Groq is unreachable.
+            # Voice coaching will gracefully disable for this session.
+            return None

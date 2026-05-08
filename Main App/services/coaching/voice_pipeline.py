@@ -78,6 +78,9 @@ class VoicePipeline:
                 return None
             
         text = self.llm.give_feedback(event, issue)
+        if not text:
+            return None
+
         voice = self.tts.speak(text)
 
         self.last_spoken_at = now
